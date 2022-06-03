@@ -1,0 +1,18 @@
+object TCP_Chat_Service: TTCP_Chat_Service
+  OldCreateOrder = False
+  AllowPause = False
+  DisplayName = 'TCP_Chat_Service'
+  OnStart = ServiceStart
+  OnStop = ServiceStop
+  Height = 74
+  Width = 80
+  object IdTCPServer1: TIdTCPServer
+    Bindings = <>
+    DefaultPort = 5060
+    OnConnect = IdTCPServer1Connect
+    OnDisconnect = IdTCPServer1Disconnect
+    OnExecute = IdTCPServer1Execute
+    Left = 24
+    Top = 16
+  end
+end

@@ -1,0 +1,216 @@
+unit Main_Unit;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.SvcMgr, Vcl.Dialogs, IdBaseComponent,
+  IdComponent, IdCustomTCPServer, IdTCPServer, INIFiles, IdGlobal, FileCtrl,
+  IdContext,WinSock;
+
+type TConnectedUsers = record
+  Nickname: string;
+  clIP: string;
+  Used: boolean;
+end;
+
+type  TRooms = record
+  RoomName: string;
+  Users: array of TConnectedUsers;
+  Used: boolean;
+end;
+
+type
+  TTCP_Chat_Service = class(TService)
+    IdTCPServer1: TIdTCPServer;
+    procedure IdTCPServer1Connect(AContext: TIdContext);
+    procedure IdTCPServer1Disconnect(AContext: TIdContext);
+    procedure IdTCPServer1Execute(AContext: TIdContext);
+    procedure ServiceStart(Sender: TService; var Started: Boolean);
+    procedure ServiceStop(Sender: TService; var Stopped: Boolean);
+  private
+    { Private declarations }
+  public
+    function GetServiceController: TServiceController; override;
+    { Public declarations }
+  end;
+
+var
+  TCP_Chat_Service: TTCP_Chat_Service;
+  LogDir: string;
+  LogFile: TextFile;
+  port: Word;
+  ConnectedUsers: array of TConnectedUsers;
+
+implementation
+
+{$R *.dfm}
+
+procedure AddLog(var add: string);
+begin
+  AssignFile(logfile, ExtractFileDir(ParamStr(0)) + '\log\[' + DateToStr(Now) + '].txt');
+  if FileExists(ExtractFileDir(ParamStr(0)) + '\log\[' +  DateToStr(Now) + '].txt') then
+    Append(logfile)
+  else
+    Rewrite(logfile);
+  Writeln(logfile, add);
+  CloseFile(logfile);
+end;
+
+function GetLocalIP: String;
+const WSVer = $101;
+var
+  wsaData: TWSAData;
+  P: PHostEnt;
+  Buf: array [0..127] of Char;
+begin
+  Result := '';
+  if WSAStartup(WSVer, wsaData) = 0 then
+    begin
+      if GetHostName(@Buf, 128) = 0 then
+        begin
+          P := GetHostByName(@Buf);
+          if P <> nil then Result := iNet_ntoa(PInAddr(p^.h_addr_list^)^);
+        end;
+      WSACleanup;
+    end;
+end;
+
+procedure ServiceController(CtrlCode: DWord); stdcall;
+begin
+  TCP_Chat_Service.Controller(CtrlCode);
+end;
+
+function TTCP_Chat_Service.GetServiceController: TServiceController;
+begin
+  Result := ServiceController;
+end;
+
+procedure TTCP_Chat_Service.IdTCPServer1Connect(AContext: TIdContext);
+var IP,nick,add:string;
+    i,j,ConnectedCount: integer;
+begin
+  ConnectedCount:=0;
+  for I := 0 to High(ConnectedUsers) do
+    if ConnectedUsers[i].Used then
+      Inc(ConnectedCount);
+
+  if ConnectedCount = Length(ConnectedUsers) then
+    begin
+      AContext.Connection.Socket.WriteLn('$F');
+      AContext.Connection.Socket.Close;
+    end
+  else
+    begin
+      ip:=AContext.Connection.Socket.Binding.PeerIP;
+      nick:=AContext.Connection.Socket.ReadLn();
+      i:=0;
+      for I := 0 to High(ConnectedUsers) do
+        if ConnectedUsers[i].Used then
+          AContext.Connection.Socket.WriteLn('$C ' + ConnectedUsers[i].Nickname);
+
+
+      for i:=0 to High(ConnectedUsers) do
+        if not ConnectedUsers[i].Used then
+          begin
+            ConnectedUsers[i].clIP := IP;
+            ConnectedUsers[i].Nickname:= nick;
+            ConnectedUsers[i].Used:=True;
+            break;
+          end;
+
+      add := '[' + TimeToStr(Now) + '] Клиент подключен: ' + nick +' [' + IP + ']';
+      AddLog(add);
+      with IdTCPServer1.Contexts.LockList do
+        try
+          for i := 0 to Count-1 do
+            begin
+              TIdContext(Items[i]).Connection.IOHandler.Writeln('$C ' + nick);
+              sleep(15);
+              TIdContext(Items[i]).Connection.IOHandler.Writeln('$M ' + '[' + TimeToStr(Now) + '] Клиент подключен: ' + nick +' [' + IP + ']' , IndyTextEncoding_UTF8);
+            end;
+        finally
+          IdTCPServer1.Contexts.UnlockList;
+        end;
+    end;
+end;
+
+procedure TTCP_Chat_Service.IdTCPServer1Disconnect(AContext: TIdContext);
+var
+  i: Integer;
+  add,nick,IP: string;
+begin
+  IP:= AContext.Connection.Socket.Binding.PeerIP;
+  for I := 0 to High(ConnectedUsers) do
+    begin
+      if ConnectedUsers[i].clIP = IP then
+        begin
+          nick:=ConnectedUsers[i].Nickname;
+          ConnectedUsers[i].Nickname:='';
+          ConnectedUsers[i].clIP:='';
+          ConnectedUsers[i].Used:=False;
+        end;
+    end;
+
+  add:='[' + TimeToStr(Now) + '] Клиент отключен: ' + nick +' [' + IP + ']';
+  AddLog(add);
+
+  with IdTCPServer1.Contexts.LockList do
+    try
+      for i := 0 to Count-1 do
+        TIdContext(Items[i]).Connection.IOHandler.Writeln('$D ' + nick);
+    finally
+      IdTCPServer1.Contexts.UnlockList;
+    end;
+
+end;
+
+procedure TTCP_Chat_Service.IdTCPServer1Execute(AContext: TIdContext);
+ var  RMessage, add: string;
+      i, j, m, n: Integer;
+begin
+  RMessage:=AContext.Connection.Socket.ReadLn(IndyTextEncoding_UTF8);
+  add:=RMessage + '[' + TimeToStr(Now) + '] ';
+  AddLog(add);
+  with IdTCPServer1.Contexts.LockList do
+    try
+      for i := 0 to Count-1 do
+        begin
+          TIdContext(Items[i]).Connection.IOHandler.Writeln('$M ' + RMessage,IndyTextEncoding_UTF8);
+        end;
+    finally
+      IdTCPServer1.Contexts.UnlockList;
+    end;
+end;
+
+procedure TTCP_Chat_Service.ServiceStart(Sender: TService;
+  var Started: Boolean);
+var add:string;
+    OptionsINI: TINIFile;
+    i,Count:integer;
+begin
+  OptionsINI:=TIniFile.Create(ExtractFileDir(ParamStr(0)) + '\Options.ini');
+  Port:=OptionsINI.ReadInteger('Options','Port',Port);
+  Count:=OptionsINI.ReadInteger('Options','Count_of_users',Count);
+  SetLength(ConnectedUsers,Count);
+  for i:=0 to Count-1 do
+    begin
+      ConnectedUsers[i].Nickname:='';
+      ConnectedUsers[i].clIP:='';
+      ConnectedUsers[i].Used:=False;
+    end;
+  IdTCPServer1.DefaultPort:=Port;
+  IdTCPServer1.Active := True;
+  add:='[' + TimeToStr(Now)+'] Сервер запущен. IP: ' + GetLocalIP + ' Порт: ' + IntToStr(Port);
+  Addlog(add);
+end;
+
+procedure TTCP_Chat_Service.ServiceStop(Sender: TService; var Stopped: Boolean);
+var add:string;
+begin
+  IdTCPServer1.Active:=false;
+  add:='[' + TimeToStr(Now)+'] Сервер остановлен';
+  Addlog(add);
+end;
+
+end.

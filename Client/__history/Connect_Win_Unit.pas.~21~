@@ -1,0 +1,85 @@
+unit Connect_Win_Unit;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, TCP_Thread, IniFiles,
+  IdCoder, IdCoder3to4, IdCoderBinHex4, IdBaseComponent;
+
+type
+  TForm2 = class(TForm)
+    Edit1: TEdit;
+    Edit3: TEdit;
+    Edit4: TEdit;
+    Label1: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Button1: TButton;
+    Label2: TLabel;
+    Edit2: TEdit;
+    IdEncoderBinHex41: TIdEncoderBinHex4;
+    IdDecoderBinHex41: TIdDecoderBinHex4;
+    procedure Button1Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormShow(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form2: TForm2;
+  OptionsINI:TIniFile;
+
+implementation
+
+{$R *.dfm}
+
+uses Main_Unit;
+
+procedure TForm2.Button1Click(Sender: TObject);
+var Host:String;
+    Port:Word;
+    choise: integer;
+begin
+  Main_Unit.Nickname:=Edit1.Text;
+  Host:=Edit2.Text;
+  Port:=StrToInt(Edit3.Text);
+  Main_Unit.TCP_Thread.Connect(Host, Main_Unit.Nickname, Port);
+  Main_Unit.Form1.Enabled:=true;
+  Form1.StatusBar1.Panels[0].Text:='Connected to ' + Host;
+  Form1.StatusBar1.Panels[1].Text:='Nickname: '+Main_Unit.Nickname;
+  OptionsINI.WriteString('Options','Nick',Edit1.Text);
+  OptionsINI.ReadString('Options','Password',IdEncoderBinHex41.Encode(Edit2.Text));
+  OptionsINI.WriteString('Options','IP',Edit3.Text);
+  OptionsINI.WriteString('Options','Port',Edit4.Text);
+  Form1.Connect1.Enabled:=True;
+  Form1.Disconnect1.Enabled:=True;
+  Form2.Close;
+
+end;
+
+procedure TForm2.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Form1.Enabled:=True;
+end;
+
+procedure TForm2.FormCreate(Sender: TObject);
+begin
+  OptionsIni := TiniFile.Create(extractfilepath(paramstr(0))+'Options.ini');
+  Edit1.Text:= OptionsINI.ReadString('Options','Nick',Edit1.Text);
+  Edit2.Text:= IdDecoderBinHex41.Decode(OptionsINI.ReadString('Options','Password',Edit2.Text));
+  Edit3.Text:= OptionsINI.ReadString('Options','IP',Edit3.Text);
+  Edit4.Text:= OptionsINI.ReadString('Options','Port',Edit4.Text);
+end;
+
+procedure TForm2.FormShow(Sender: TObject);
+begin
+  Top:=Form1.Top+round(Form1.Height/2)-round(Height/2);
+  Left:=Form1.Left+round(Form1.Width/2)-round(Width/2);
+end;
+
+end.

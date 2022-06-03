@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.964,=D:\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.591,=D:\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.058,D:\Documents\Embarcadero\Studio\Projects\Unit1.pas=D:\desktop\TCP_Chat\ClientAndroid\Main_Unit.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.058,D:\Documents\Embarcadero\Studio\Projects\Unit1.fmx=D:\desktop\TCP_Chat\ClientAndroid\Main_Unit.fmx</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.212,=D:\desktop\TCP_Chat\ClientAndroid\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.625,=D:\desktop\TCP_Chat\ClientAndroid\TCP_Thread.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.147,D:\Documents\Embarcadero\Studio\Projects\Project1.dproj=D:\desktop\TCP_Chat\ClientAndroid\TCP_Chat.dproj</Transaction>
+  </Transactions>
+</BorlandProject>

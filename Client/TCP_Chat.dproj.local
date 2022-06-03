@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.197,D:\Documents\Embarcadero\Studio\Projects\Unit2.pas=D:\desktop\minichat\Client\TCP_Thread.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.580,=D:\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.964,=D:\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.447,D:\Documents\Embarcadero\Studio\Projects\Project1.dproj=D:\desktop\minichat\Client\TCP_Chat.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.424,=E:\Users\LORD\Desktop\minichat\Client\Unit3.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.407,E:\Users\LORD\Desktop\minichat\Client\Unit3.pas=E:\Users\LORD\Desktop\minichat\Client\PopUpWin_Unit.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.338,=D:\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.407,E:\Users\LORD\Desktop\minichat\Client\Unit3.dfm=E:\Users\LORD\Desktop\minichat\Client\PopUpWin_Unit.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.586,D:\desktop\minichat\Client\Unit2.dfm=D:\desktop\minichat\Client\Connect_Win_Unit.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.097,D:\Documents\Embarcadero\Studio\Projects\Unit1.dfm=D:\desktop\minichat\Client\Main_Unit.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.097,D:\Documents\Embarcadero\Studio\Projects\Unit1.pas=D:\desktop\minichat\Client\Main_Unit.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.586,D:\desktop\minichat\Client\Unit2.pas=D:\desktop\minichat\Client\Connect_Win_Unit.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.374,=D:\desktop\minichat\Client\Unit2.pas</Transaction>
+  </Transactions>
+</BorlandProject>

@@ -1,0 +1,127 @@
+unit PopUpWin_Unit;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls;
+
+type
+  TForm3 = class(TForm)
+    Timer1: TTimer;
+    Timer2: TTimer;
+    Label1: TLabel;
+    Label2: TLabel;
+    procedure FormShow(Sender: TObject);
+    procedure FormHide(Sender: TObject);
+    procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure FormMouseLeave(Sender: TObject);
+    procedure Label1Click(Sender: TObject);
+    procedure Label1MouseEnter(Sender: TObject);
+    procedure Label1MouseLeave(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
+    procedure Timer2Timer(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form3: TForm3;
+  i:integer = 0;
+  AlphaShown:Byte;
+
+implementation
+
+{$R *.dfm}
+
+procedure TForm3.FormHide(Sender: TObject);
+begin
+  Timer1.Enabled:=False;
+  Timer2.Enabled:=False;
+  Timer2.Interval:=1000;
+  i:=0;
+  AlphaBlendValue:=0;
+  Top:=Screen.Height;
+end;
+
+procedure TForm3.FormMouseLeave(Sender: TObject);
+begin
+  Timer2.Enabled:=true;
+  AlphaBlendValue:=AlphaShown;
+end;
+
+procedure TForm3.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+begin
+  Timer2.Enabled:=False;
+  top:=Screen.Height-Form3.Height-50;
+  AlphaBlendValue:=255;
+  Timer2.Interval:=1;
+end;
+
+procedure TForm3.FormShow(Sender: TObject);
+begin
+  Top:=Screen.Height;
+  left:=Screen.Width-Width;
+  Timer1.Enabled:=true;
+  FormStyle:=fsStayOnTop;
+end;
+
+procedure TForm3.Label1Click(Sender: TObject);
+begin
+  Form3.Hide;
+end;
+
+procedure TForm3.Label1MouseEnter(Sender: TObject);
+begin
+  Label1.Font.Style:=[fsBold];
+end;
+
+procedure TForm3.Label1MouseLeave(Sender: TObject);
+begin
+  Label1.Font.Style:=[];
+end;
+
+procedure TForm3.Timer1Timer(Sender: TObject);
+begin
+  Form3.top:=top-20;
+  AlphaBlendValue:=AlphaBlendValue+20;
+  if Form3.top <= Screen.Height-Form3.Height-50 then
+    Begin
+      timer1.Enabled:=false;
+      timer2.Enabled:=true;
+      AlphaShown:=AlphaBlendValue;
+    End;
+
+end;
+
+procedure TForm3.Timer2Timer(Sender: TObject);
+begin
+  Inc(i);
+  if i = 6 then
+    begin
+      Timer2.Interval:=1;
+    end;
+  if Timer2.Interval = 1 then
+    AlphaBlendValue:=AlphaBlendValue-1;
+  if AlphaBlendValue = 100 then
+    begin
+      i:=7;
+      Timer2.Interval:=2;
+    end;
+  if i = 7 then
+    begin
+      Top:=Top+1;
+    end;
+  if top>=Screen.Height then
+    begin
+      Timer2.Enabled:=false;
+      Timer2.Interval:=1000;
+      i:=0;
+      Form3.Hide;
+    end;
+end;
+
+end.

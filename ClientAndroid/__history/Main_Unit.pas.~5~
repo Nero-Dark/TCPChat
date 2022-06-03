@@ -1,0 +1,107 @@
+unit Main_Unit;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Ani,
+  FMX.StdCtrls, FMX.Layouts, FMX.ListBox, FMX.Controls.Presentation, TCP_Thread,
+  FMX.Edit, FMX.ScrollBox, FMX.Memo, IdGlobal;
+
+type
+  TForm1 = class(TForm)
+    MainPanel: TPanel;
+    SpeedButton1: TSpeedButton;
+    FloatAnimation1: TFloatAnimation;
+    MenuPanel: TPanel;
+    SpeedButton2: TSpeedButton;
+    SpeedButton3: TSpeedButton;
+    SpeedButton4: TSpeedButton;
+    Memo1: TMemo;
+    Edit1: TEdit;
+    Button1: TButton;
+    procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure SpeedButton3Click(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+  SMessage:string;
+  TCP_Thread: TTCP_Thread;
+  Nickname:string;
+
+implementation
+
+{$R *.fmx}
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+  TCP_Thread.Suspend;
+  Memo1.Lines.Add('[' + Nickname + ']: ' + Edit1.Text + ' [' + TimeToStr(Now) + ']');
+  SMessage:='[' + Nickname + ']: ' + Edit1.Text;
+  Edit1.Text:='';
+  TCP_Thread.TCPClient.IOHandler.Writeln(SMessage, IndyTextEncoding_UTF8);
+  TCP_Thread.Resume;
+end;
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+  TCP_Thread:=TTCP_Thread.Create;
+  TCP_Thread.CreateTCP;
+  Nickname:='NERO';
+
+  Edit1.Position.Y:=;
+  Edit1.Position.X:=;
+  Edit1.Height:=;
+  Edit1.Width:= ;
+  Button1.Width:=;
+  Button1.Height:=;
+  Button1.Position.Y:=;                    //надо править исходя из MainPanel
+  Button1.Position.X:= ;
+
+  Memo1.Height:=;
+  Memo1.Width:=;
+  Memo1.Position.Y:=;
+  Memo1.Position.X:=;
+end;
+
+procedure TForm1.SpeedButton1Click(Sender: TObject);
+
+begin
+  if (MenuPanel.Position.X=Self.ClientWidth - 60) then
+    begin
+      FloatAnimation1.StartValue:= Self.ClientWidth - 60;
+      FloatAnimation1.StopValue:= 0;
+    end
+  else
+    begin
+      FloatAnimation1.StartValue:= 0;
+      FloatAnimation1.StopValue:= Self.ClientWidth - 60;
+    end;
+  FloatAnimation1.Start;
+end;
+
+procedure TForm1.SpeedButton2Click(Sender: TObject);
+begin
+  try
+    TCP_Thread.Connect('192.168.88.107',Nickname,2005);
+  finally
+    FloatAnimation1.StartValue:= Self.ClientWidth - 60;
+    FloatAnimation1.StopValue:=0;
+    FloatAnimation1.Start;
+  end;
+end;
+
+procedure TForm1.SpeedButton3Click(Sender: TObject);
+begin
+  TCP_Thread.TCPClient.Disconnect;
+end;
+
+end.
